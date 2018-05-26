@@ -1,5 +1,5 @@
 [package]
-name = "EntityComponentSystem" # the name of the package
+name = "entity_component_system" # the name of the package
 version = "0.1.0"    # the current version, obeying semver
 authors = ["bpg@pdx.edu"]
 build = "build.rs"
