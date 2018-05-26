@@ -33,7 +33,7 @@ lazy_static! {
 
 pub struct ECSystem {
 
-    //pub game_objects: HashMap<String, Box<GameObject>>,
+    pub game_objects_to_add: HashMap<String, Box<GameObject>>,
     pub input: Input,
 }
 
@@ -42,7 +42,7 @@ impl ECSystem {
     pub fn new() -> Self {
         println!("new ecsystem");
         let ecs = ECSystem{
-            //game_objects: HashMap::new(),
+            game_objects_to_add: HashMap::new(),
             input: Input {keycode_down: None, keymod_down: None, keycode_up: None, keymod_up: None},
 
         };
@@ -51,9 +51,9 @@ impl ECSystem {
 
     pub fn add_game_object(&mut self, go: Box<GameObject>) {
         let tag = go.tag.clone();
-        TAGS.lock().unwrap().insert(tag.clone());
         
-        GAME_OBJECTS.lock().unwrap().insert(tag.clone(), go);
+        
+        self.game_objects_to_add.insert(tag.clone(), go);
     }
 
     //pub fn get_game_object<'a>(&'a mut self, tag: String) -> &'a mut GameObject {
@@ -61,13 +61,39 @@ impl ECSystem {
     //}
 
 
-    pub fn update(&mut self) {
-       let tags = TAGS.lock().unwrap();
-        for tag in tags.iter() {
-            //GAME_OBJECTS.lock().unwrap()[tag].update(self);
-            GAME_OBJECTS.lock().unwrap().get_mut(&tag.clone()).unwrap().update(self);
+    pub fn update(&mut self, ctx: &mut Context) {
+        let tags = TAGS.lock().unwrap();
+        let game_objects = &mut GAME_OBJECTS.lock().unwrap();
+
+        if game_objects.len() > 0 {
+            for tag in tags.iter() {
+                //GAME_OBJECTS.lock().unwrap()[tag].update(self);
+                game_objects.get_mut(&tag.clone()).unwrap().update(ctx, self);
+            }
         }
+
+        
     }    
+
+    pub fn late_update(&mut self) {
+        if self.game_objects_to_add.len() > 0 {
+            for (tag, go) in &self.game_objects_to_add {
+                GAME_OBJECTS.lock().unwrap().insert(tag.clone(), go.clone());
+                TAGS.lock().unwrap().insert(tag.clone());
+            }
+            self.game_objects_to_add.clear();
+        }
+        
+        let tags = TAGS.lock().unwrap();
+        let game_objects = &mut GAME_OBJECTS.lock().unwrap();
+
+        if game_objects.len() > 0 {
+            for tag in tags.iter() {
+                game_objects.get_mut(&tag.clone()).unwrap().late_update();
+            }
+        }
+        
+    }
     
     pub fn render(&mut self, ctx: &mut Context) {
         let tags = TAGS.lock().unwrap();

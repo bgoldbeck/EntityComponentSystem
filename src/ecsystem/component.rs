@@ -17,7 +17,7 @@ use ecsystem::player_controller::*;
 pub trait IComponent {
     
     fn start(&mut self, ecs: &mut ECSystem);
-    fn update(&mut self, ecs: &mut ECSystem, go: &mut GameObject);
+    fn update(&mut self, ctx: &mut Context, ecs: &mut ECSystem, go: &mut GameObject);
     
     fn render(&self, ctx: &mut Context, go: &GameObject);
     
@@ -48,11 +48,11 @@ impl IComponent for Component {
         }
     }
 
-    fn update(&mut self, ecs: &mut ECSystem, go: &mut GameObject) {
+    fn update(&mut self, ctx: &mut Context, ecs: &mut ECSystem, go: &mut GameObject) {
         match self {
-            &mut Component::Renderable{..} => renderable_update(self, ecs, go),
-            &mut Component::RenderableText{..} => renderable_text_update(self, ecs, go),
-            &mut Component::PlayerController{..} => player_controller_update(self, ecs, go),
+            &mut Component::Renderable{..} => renderable_update(self, ctx, ecs, go),
+            &mut Component::RenderableText{..} => renderable_text_update(self, ctx, ecs, go),
+            &mut Component::PlayerController{..} => player_controller_update(self, ctx, ecs, go),
             _ => (),
         }
     }

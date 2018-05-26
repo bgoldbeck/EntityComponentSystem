@@ -22,7 +22,7 @@ pub fn renderable_text_start(component: &mut Component, ecs: &mut ECSystem) {
     }
 }
 
-pub fn renderable_text_update(component: &mut Component, ecs: &mut ECSystem, go: &mut GameObject) {
+pub fn renderable_text_update(component: &mut Component, ctx: &mut Context, ecs: &mut ECSystem, go: &mut GameObject) {
     match component {
         &mut Component::RenderableText{..} => {
            // println!("RT UPDATE");

@@ -86,24 +86,27 @@ impl MainState {
        
         // Create and add a player game object to the system. 
         let tag: String = "player".to_string();
-        
+        println!("creating player");
         let mut player = GameObject::new(tag.clone());
 
+        println!("add renderable component");
         player.add_component(Box::new(Component::Renderable {
             sprite: graphics::Image::new(ctx, "/texture/crab.png").unwrap(),
-            }), &mut ecs);
+            }));
         
-
+        println!("add renderable text component");
         player.add_component(Box::new(Component::RenderableText {
             text: "Player".to_string(),
-            }), &mut ecs);
-
+            }));
+        
+        println!("add player controller");
         player.add_component(Box::new(Component::PlayerController {
-            }), &mut ecs);
+            }));
 
+        println!("add game object to ecs");
         ecs.add_game_object(player);
         
-    
+        println!("create mainstate");
         let mut s = MainState {
             ecsystem: ecs,
             frames: 0,
@@ -120,7 +123,7 @@ impl MainState {
 // The `EventHandler` trait also contains callbacks for event handling
 // that you can override if you wish, but the defaults are fine.
 impl event::EventHandler for MainState {
-    fn update(&mut self, _ctx: &mut Context) -> GameResult<()> {
+    fn update(&mut self, ctx: &mut Context) -> GameResult<()> {
         /*
         if self.ecsystem.input.keycode_up != None {
             self.ecsystem.input = Input {
@@ -131,8 +134,8 @@ impl event::EventHandler for MainState {
             };
         }
         */
-        self.ecsystem.update();
-        
+        self.ecsystem.update(ctx);
+        self.ecsystem.late_update();
 
         Ok(())
     }

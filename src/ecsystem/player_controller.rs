@@ -14,15 +14,16 @@ use ecsystem::Input;
 use ggez::GameResult;
 
 
-pub struct Movement {
+pub struct Controls {
     pub left: bool,
     pub right: bool,
     pub up: bool,
     pub down: bool,
+    pub shoot: bool,
 }
 
 lazy_static! {
-    static ref MOVEMENT: Mutex<Movement> = Mutex::new(Movement {left: false, right: false, up: false, down: false});
+    static ref CONTROLS: Mutex<Controls> = Mutex::new(Controls {left: false, right: false, up: false, down: false, shoot: false});
     static ref SPEED: Mutex<f32> = Mutex::new(10.0);
 }
 
@@ -34,69 +35,92 @@ pub fn player_controller_start(component: &mut Component, ecs: &mut ECSystem) {
     }
 }
 
-pub fn player_controller_update(component: &mut Component, ecs: &mut ECSystem, go: &mut GameObject) {
+pub fn player_controller_update(component: &mut Component, ctx: &mut Context, ecs: &mut ECSystem, go: &mut GameObject) {
 
     
-
     match component {
         &mut Component::PlayerController{..} => {
             
-          
+            // Keycode DOWN
+            if ecs.input.keycode_down == Some(ggez::event::Keycode::Space) {
+                CONTROLS.lock().unwrap().shoot = true;
+                ecs.input.keycode_down = None;
+            }
+
             if ecs.input.keycode_down == Some(ggez::event::Keycode::Left) {
-                MOVEMENT.lock().unwrap().left = true;
+                CONTROLS.lock().unwrap().left = true;
                 ecs.input.keycode_down = None;
             }
 
             if ecs.input.keycode_down == Some(ggez::event::Keycode::Right) {
-                MOVEMENT.lock().unwrap().right = true; 
+                CONTROLS.lock().unwrap().right = true; 
                 ecs.input.keycode_down = None;
             }
 
             if ecs.input.keycode_down == Some(ggez::event::Keycode::Up) {
-                MOVEMENT.lock().unwrap().up = true;
+                CONTROLS.lock().unwrap().up = true;
                 ecs.input.keycode_down = None;
             }
 
             if ecs.input.keycode_down == Some(ggez::event::Keycode::Down) {
-                MOVEMENT.lock().unwrap().down = true;    
+                CONTROLS.lock().unwrap().down = true;    
                 ecs.input.keycode_down = None;
+            }     
+            // Keycode UP
+            if ecs.input.keycode_up == Some(ggez::event::Keycode::Space) {
+                CONTROLS.lock().unwrap().shoot = false;
+                ecs.input.keycode_up = None;
             }
 
             if ecs.input.keycode_up == Some(ggez::event::Keycode::Up) {
-                MOVEMENT.lock().unwrap().up = false; 
+                CONTROLS.lock().unwrap().up = false; 
                 ecs.input.keycode_up = None;
             }
              
             if ecs.input.keycode_up == Some(ggez::event::Keycode::Down) {
-                MOVEMENT.lock().unwrap().down = false;   
+                CONTROLS.lock().unwrap().down = false;   
                 ecs.input.keycode_up = None;
             }
              
             if ecs.input.keycode_up == Some(ggez::event::Keycode::Left) {
-                MOVEMENT.lock().unwrap().left = false;
+                CONTROLS.lock().unwrap().left = false;
                 ecs.input.keycode_up = None;
             }
              
             if ecs.input.keycode_up == Some(ggez::event::Keycode::Right) {
-                MOVEMENT.lock().unwrap().right = false;  
+                CONTROLS.lock().unwrap().right = false;  
                 ecs.input.keycode_up = None;
             }
-         
 
+    
+            
+            let mut left: bool = CONTROLS.lock().unwrap().left;
+            let mut right: bool = CONTROLS.lock().unwrap().right;
+            let mut up: bool = CONTROLS.lock().unwrap().up;
+            let mut down: bool = CONTROLS.lock().unwrap().down;
+            let mut shoot: bool = CONTROLS.lock().unwrap().shoot;
 
-            let mut left: bool = MOVEMENT.lock().unwrap().left;
-            let mut right: bool = MOVEMENT.lock().unwrap().right;
-            let mut up: bool = MOVEMENT.lock().unwrap().up;
-            let mut down: bool = MOVEMENT.lock().unwrap().down;
+            if shoot {    
+                println!("spawn bullet");
+                CONTROLS.lock().unwrap().shoot = false;
+
+                let mut bullet = GameObject::new("bullet".to_string());
+                bullet.add_component(Box::new(Component::Renderable {
+                    sprite: graphics::Image::new(ctx, "/texture/crab.png").unwrap(),
+                }));
+                
+                ecs.add_game_object(bullet);
+            }
+            
 
             match (up, right, down, left) {
-                ( true, false, false, false) => (                                    go.pos.y -= *SPEED.lock().unwrap()), //self.translate(0.0, -vel),
+                ( true, false, false, false) => {                                    go.pos.y -= *SPEED.lock().unwrap()}, //self.translate(0.0, -vel),
                 ( true,  true, false, false) => {go.pos.x += *SPEED.lock().unwrap(); go.pos.y -= *SPEED.lock().unwrap()}, //self.translate(vel*0.707, -vel*0.707),
-                (false,  true, false, false) => (go.pos.x += *SPEED.lock().unwrap()                                    ), //self.translate(vel, 0.0),
+                (false,  true, false, false) => {go.pos.x += *SPEED.lock().unwrap()                                    }, //self.translate(vel, 0.0),
                 (false,  true,  true, false) => {go.pos.x += *SPEED.lock().unwrap(); go.pos.y += *SPEED.lock().unwrap()}, //self.translate(vel*0.707, vel*0.707),
-                (false, false,  true, false) => (                                    go.pos.y += *SPEED.lock().unwrap()), //self.translate(0.0, vel),
+                (false, false,  true, false) => {                                    go.pos.y += *SPEED.lock().unwrap()}, //self.translate(0.0, vel),
                 (false, false,  true,  true) => {go.pos.x -= *SPEED.lock().unwrap(); go.pos.y += *SPEED.lock().unwrap()}, //self.translate(-vel*0.707, vel*0.707),
-                (false, false, false,  true) => (go.pos.x -= *SPEED.lock().unwrap()                                    ), //self.translate(-vel, 0.0),
+                (false, false, false,  true) => {go.pos.x -= *SPEED.lock().unwrap()                                    }, //self.translate(-vel, 0.0),
                 ( true, false, false,  true) => {go.pos.x -= *SPEED.lock().unwrap(); go.pos.y -= *SPEED.lock().unwrap()}, //self.translate(-vel*0.707, -vel*0.707),
                 _ => (),
             }
