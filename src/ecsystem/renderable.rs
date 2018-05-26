@@ -15,7 +15,7 @@ use ggez::GameResult;
 pub fn renderable_start(component: &mut Component, ecs: &mut ECSystem) {
     match component {
         &mut Component::Renderable{..} => {
-            println!("R START DEBUG");
+            //println!("R START DEBUG");
         }
         _ => (),
     }
@@ -24,7 +24,7 @@ pub fn renderable_start(component: &mut Component, ecs: &mut ECSystem) {
 pub fn renderable_update(component: &mut Component, ecs: &mut ECSystem, go: &mut GameObject) {
     match component {
         &mut Component::Renderable{..} => {
-            println!("R UPDATE");
+            //println!("R UPDATE");
         
         }
         _ => (),

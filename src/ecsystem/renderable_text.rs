@@ -16,7 +16,7 @@ use ggez::GameResult;
 pub fn renderable_text_start(component: &mut Component, ecs: &mut ECSystem) {
     match component {
         &mut Component::RenderableText{..} => {
-            println!("RT START DEBUG");
+            //println!("RT START DEBUG");
         }
         _ => (),
     }
@@ -25,7 +25,7 @@ pub fn renderable_text_start(component: &mut Component, ecs: &mut ECSystem) {
 pub fn renderable_text_update(component: &mut Component, ecs: &mut ECSystem, go: &mut GameObject) {
     match component {
         &mut Component::RenderableText{..} => {
-            println!("RT UPDATE");
+           // println!("RT UPDATE");
         }
         _ => (),
     }

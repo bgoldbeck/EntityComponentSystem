@@ -69,13 +69,7 @@ impl Game {
 // First we make a structure to contain the game's state
 pub struct MainState {
     pub ecsystem: ECSystem,
-    //score_text: graphics::Text,
     pub frames: usize,
-    //player: entity::Entity,
-    //score: u32,
-    //font: graphics::Font,
-    pub background: graphics::Image,
-    
 }
 
 impl MainState {
@@ -84,39 +78,35 @@ impl MainState {
     pub fn new(ctx: &mut Context) -> GameResult<MainState> {
         // The ttf file will be in your resources directory. Later, we
         // will mount that directory so we can omit it in the path here.
+        
         let font = graphics::Font::new(ctx, "/font/FiraSans-Regular.ttf", 48)?;
         let score_text = graphics::Text::new(ctx, "Score: ", &font)?;
         let mut ecs: ECSystem = ECSystem::new();
 
        
-        {
-            let tag: String = "player".to_string();
-            
-            let mut player = GameObject::new(tag.clone());
+        // Create and add a player game object to the system. 
+        let tag: String = "player".to_string();
+        
+        let mut player = GameObject::new(tag.clone());
 
-            println!("Adding component renderable");
-            player.add_component(Box::new(Component::Renderable {
-                sprite: graphics::Image::new(ctx, "/texture/crab.png").unwrap(),
-                }), &mut ecs);
-            
-            println!("Adding component renderable-text");
-            player.add_component(Box::new(Component::RenderableText {
-                text: "Player".to_string(),
-                }), &mut ecs);
+        player.add_component(Box::new(Component::Renderable {
+            sprite: graphics::Image::new(ctx, "/texture/crab.png").unwrap(),
+            }), &mut ecs);
+        
 
-            player.add_component(Box::new(Component::PlayerController {
-                }), &mut ecs);
+        player.add_component(Box::new(Component::RenderableText {
+            text: "Player".to_string(),
+            }), &mut ecs);
 
-            println!("Adding player game object to ECSystem");
-            ecs.add_game_object(player);
-         
-        }
+        player.add_component(Box::new(Component::PlayerController {
+            }), &mut ecs);
 
+        ecs.add_game_object(player);
+        
+    
         let mut s = MainState {
             ecsystem: ecs,
             frames: 0,
-   
-            background: graphics::Image::new(ctx, "/texture/background.png").unwrap(),
         };
 
         Ok(s)
@@ -131,9 +121,7 @@ impl MainState {
 // that you can override if you wish, but the defaults are fine.
 impl event::EventHandler for MainState {
     fn update(&mut self, _ctx: &mut Context) -> GameResult<()> {
-
-        self.ecsystem.update();
-        
+        /*
         if self.ecsystem.input.keycode_up != None {
             self.ecsystem.input = Input {
                 keycode_down: None,
@@ -142,6 +130,10 @@ impl event::EventHandler for MainState {
                 keymod_up: None,
             };
         }
+        */
+        self.ecsystem.update();
+        
+
         Ok(())
     }
 
@@ -167,24 +159,44 @@ impl event::EventHandler for MainState {
     // Event is triggered when the player presses keydowns
     fn key_down_event(&mut self, _ctx: &mut Context, keycode: Keycode, keymod: Mod, repeat: bool) {
         println!("keydown: {:?}", keycode);
-        self.ecsystem.input = Input {
-            keycode_down: Some(keycode),
-            keymod_down: Some(keymod),
-            keymod_up: None,
-            keycode_up: None,
-        };
+        
+        match self.ecsystem.input.keycode_down {
+            None => self.ecsystem.input.keycode_down = Some(keycode),
+            _ => (),
+        }
+        match self.ecsystem.input.keymod_down {
+            None => self.ecsystem.input.keymod_down = Some(keymod),
+            _ => (),
+        }
+
+        //self.ecsystem.input = Input {
+        //    keycode_down: Some(keycode),
+        //    keymod_down: Some(keymod),
+        //    keymod_up: self.ecsystem.input.keymod_down,
+        //    keycode_up: self.ecsystem.input.keycode_down,
+        //};
         
     }
     
 	// Event is triggered when player lifts up on a keys
     fn key_up_event(&mut self, _ctx: &mut Context, keycode: Keycode, keymod: Mod, repeat: bool) {
         println!("keyup: {:?}", keycode);
-        self.ecsystem.input = Input {
-            keycode_down: None,
-            keymod_down: None,
-            keycode_up: Some(keycode),
-            keymod_up: Some(keymod),
-        };
+        
+        match self.ecsystem.input.keycode_up {
+            None => self.ecsystem.input.keycode_up = Some(keycode),
+            _ => (),
+        }
+        match self.ecsystem.input.keymod_up {
+            None => self.ecsystem.input.keymod_up = Some(keymod),
+            _ => (),
+        }
+
+        //self.ecsystem.input = Input {
+            //keycode_down: self.ecsystem.input.keycode_down,
+            //keymod_down: self.ecsystem.input.keymod_down,
+            //keycode_up: Some(keycode),
+            //keymod_up: Some(keymod),
+        //};
     }
     
 }

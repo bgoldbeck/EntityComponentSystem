@@ -50,7 +50,7 @@ impl GameObject {
 
 
     pub fn update(&mut self, ecs: &mut ECSystem) {
-        println!("UPDATE GO");
+        
         let mut component_map = COMPONENTS.lock().unwrap();
 
         let mut my_components: &mut Vec<Box<Component>> = component_map.get_mut(&self.tag).unwrap();
