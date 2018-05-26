@@ -1,0 +1,10 @@
+[package]
+name = "EntityComponentSystem" # the name of the package
+version = "0.1.0"    # the current version, obeying semver
+authors = ["bpg@pdx.edu"]
+build = "build.rs"
+
+
+[dependencies]
+ggez = "0.4"
+lazy_static = "1.0"
