@@ -6,9 +6,9 @@ pub mod gameobject;
 pub mod component;
 pub mod player_controller;
 pub mod renderable_text;
+pub mod blackboard;
 
-
-
+use self::blackboard::*;
 use std::sync::Mutex;
 use ggez::event::*;
 use ggez::Context;
@@ -26,15 +26,24 @@ pub struct Input {
     pub keymod_up: Option<Mod>,
 }
 
+pub enum Field {
+    Int32(i32),
+    Int64(i64),
+    String(String),
+    
+}
+
 lazy_static! {
     pub static ref GAME_OBJECTS: Mutex<HashMap<String, Box<GameObject>>> = Mutex::new(HashMap::new());
+    //pub static ref BLACKBOARD: Mutex<HashMap<String, <T>> = Mutex::new(HashMap::new());
+    pub static ref ENTITY_FIELDS: Mutex<HashMap<String, HashMap<String, Field>>> = Mutex::new(HashMap::new());
     pub static ref TAGS: Mutex<HashSet<String>> = Mutex::new(HashSet::new()); 
 }
 
 pub struct ECSystem {
-
     pub game_objects_to_add: HashMap<String, Box<GameObject>>,
     pub input: Input,
+    pub blackboard: Blackboard,
 }
 
 
@@ -44,7 +53,7 @@ impl ECSystem {
         let ecs = ECSystem{
             game_objects_to_add: HashMap::new(),
             input: Input {keycode_down: None, keymod_down: None, keycode_up: None, keymod_up: None},
-
+            blackboard: Blackboard::new(),
         };
         ecs
     }
@@ -60,6 +69,10 @@ impl ECSystem {
         //GAME_OBJECTS.lock().unwrap().get_mut(&tag).unwrap()
     //}
 
+    // Write something on the blackboard.
+    pub fn blackboard(&mut self) -> &mut Blackboard {
+        &mut self.blackboard
+    }
 
     pub fn update(&mut self, ctx: &mut Context) {
         let tags = TAGS.lock().unwrap();
@@ -71,8 +84,6 @@ impl ECSystem {
                 game_objects.get_mut(&tag.clone()).unwrap().update(ctx, self);
             }
         }
-
-        
     }    
 
     pub fn late_update(&mut self) {
@@ -95,6 +106,8 @@ impl ECSystem {
         
     }
     
+
+
     pub fn render(&mut self, ctx: &mut Context) {
         let tags = TAGS.lock().unwrap();
         for tag in tags.iter() {

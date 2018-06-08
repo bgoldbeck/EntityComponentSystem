@@ -8,11 +8,12 @@ use ecsystem::component::Component;
 use ecsystem::component::IComponent;
 use ecsystem::gameobject::GameObject;
 use ecsystem::ECSystem;
+use ecsystem::*;
 use std::sync::Mutex;
 use ecsystem::Input;
-
+use std::borrow::Borrow;
 use ggez::GameResult;
-
+use self::blackboard::*;
 
 pub struct Controls {
     pub left: bool,
@@ -41,59 +42,63 @@ pub fn player_controller_update(component: &mut Component, ctx: &mut Context, ec
     match component {
         &mut Component::PlayerController{..} => {
             
+
             // Keycode DOWN
             if ecs.input.keycode_down == Some(ggez::event::Keycode::Space) {
                 CONTROLS.lock().unwrap().shoot = true;
-                ecs.input.keycode_down = None;
+                //ecs.input.keycode_down = None;
             }
 
             if ecs.input.keycode_down == Some(ggez::event::Keycode::Left) {
                 CONTROLS.lock().unwrap().left = true;
+                CONTROLS.lock().unwrap().right = false;
                 ecs.input.keycode_down = None;
             }
-
-            if ecs.input.keycode_down == Some(ggez::event::Keycode::Right) {
+            else if ecs.input.keycode_down == Some(ggez::event::Keycode::Right) {
                 CONTROLS.lock().unwrap().right = true; 
+                CONTROLS.lock().unwrap().left = false;
                 ecs.input.keycode_down = None;
             }
 
             if ecs.input.keycode_down == Some(ggez::event::Keycode::Up) {
                 CONTROLS.lock().unwrap().up = true;
+                CONTROLS.lock().unwrap().down = false;
                 ecs.input.keycode_down = None;
             }
-
-            if ecs.input.keycode_down == Some(ggez::event::Keycode::Down) {
+            else if ecs.input.keycode_down == Some(ggez::event::Keycode::Down) {
                 CONTROLS.lock().unwrap().down = true;    
+                CONTROLS.lock().unwrap().up = false;    
                 ecs.input.keycode_down = None;
-            }     
+            }   
+
             // Keycode UP
             if ecs.input.keycode_up == Some(ggez::event::Keycode::Space) {
                 CONTROLS.lock().unwrap().shoot = false;
-                ecs.input.keycode_up = None;
+                //ecs.input.keycode_up = None;
             }
+
 
             if ecs.input.keycode_up == Some(ggez::event::Keycode::Up) {
                 CONTROLS.lock().unwrap().up = false; 
                 ecs.input.keycode_up = None;
             }
-             
-            if ecs.input.keycode_up == Some(ggez::event::Keycode::Down) {
+            else if ecs.input.keycode_up == Some(ggez::event::Keycode::Down) {
                 CONTROLS.lock().unwrap().down = false;   
                 ecs.input.keycode_up = None;
-            }
-             
+            }             
+
             if ecs.input.keycode_up == Some(ggez::event::Keycode::Left) {
                 CONTROLS.lock().unwrap().left = false;
                 ecs.input.keycode_up = None;
             }
-             
-            if ecs.input.keycode_up == Some(ggez::event::Keycode::Right) {
+            else if ecs.input.keycode_up == Some(ggez::event::Keycode::Right) {
                 CONTROLS.lock().unwrap().right = false;  
                 ecs.input.keycode_up = None;
             }
 
-    
-            
+            //ecs.blackboard.scribble(go.tag().clone(), BlackboardObject::Int(35));
+          
+
             let mut left: bool = CONTROLS.lock().unwrap().left;
             let mut right: bool = CONTROLS.lock().unwrap().right;
             let mut up: bool = CONTROLS.lock().unwrap().up;
@@ -101,12 +106,14 @@ pub fn player_controller_update(component: &mut Component, ctx: &mut Context, ec
             let mut shoot: bool = CONTROLS.lock().unwrap().shoot;
 
             if shoot {    
+                // Deadlock as soon as access game objects.
+                //GAME_OBJECTS.lock().unwrap();
                 println!("spawn bullet");
                 CONTROLS.lock().unwrap().shoot = false;
 
                 let mut bullet = GameObject::new("bullet".to_string());
                 bullet.add_component(Box::new(Component::Renderable {
-                    sprite: graphics::Image::new(ctx, "/texture/crab.png").unwrap(),
+                    sprite: graphics::Image::new(ctx, "/texture/background.png").unwrap(),
                 }));
                 
                 ecs.add_game_object(bullet);
@@ -126,7 +133,7 @@ pub fn player_controller_update(component: &mut Component, ctx: &mut Context, ec
             }
     
             // Consume the input.
-            ecs.input = Input {keycode_up: None, keymod_up: None, keycode_down: None, keymod_down: None};
+            //ecs.input = Input {keycode_up: None, keymod_up: None, keycode_down: None, keymod_down: None};
         }
         _ => (),
     }

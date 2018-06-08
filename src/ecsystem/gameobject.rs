@@ -23,6 +23,9 @@ pub struct GameObject {
     
 }
 
+
+
+
 lazy_static! {
     pub static ref COMPONENTS: Mutex<HashMap<String, Vec<Box<Component>>>> = Mutex::new(HashMap::new());
 }
@@ -143,6 +146,9 @@ impl GameObject {
         None
     }
 
+    pub fn tag(&self) -> &String {
+        &self.tag
+    }
     //pub fn remove_component(&mut self, component: IComponent) {
         //let index = self.components.iter().position(|&ref x| x == &component).unwrap();
 

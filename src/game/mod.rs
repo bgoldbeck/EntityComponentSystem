@@ -163,6 +163,10 @@ impl event::EventHandler for MainState {
     fn key_down_event(&mut self, _ctx: &mut Context, keycode: Keycode, keymod: Mod, repeat: bool) {
         println!("keydown: {:?}", keycode);
         
+        self.ecsystem.input.keycode_down = Some(keycode);
+        self.ecsystem.input.keymod_down = Some(keymod);
+
+        /*
         match self.ecsystem.input.keycode_down {
             None => self.ecsystem.input.keycode_down = Some(keycode),
             _ => (),
@@ -171,7 +175,7 @@ impl event::EventHandler for MainState {
             None => self.ecsystem.input.keymod_down = Some(keymod),
             _ => (),
         }
-
+        */
         //self.ecsystem.input = Input {
         //    keycode_down: Some(keycode),
         //    keymod_down: Some(keymod),
@@ -184,7 +188,10 @@ impl event::EventHandler for MainState {
 	// Event is triggered when player lifts up on a keys
     fn key_up_event(&mut self, _ctx: &mut Context, keycode: Keycode, keymod: Mod, repeat: bool) {
         println!("keyup: {:?}", keycode);
-        
+
+        self.ecsystem.input.keycode_up = Some(keycode);
+        self.ecsystem.input.keymod_up = Some(keymod);
+        /*
         match self.ecsystem.input.keycode_up {
             None => self.ecsystem.input.keycode_up = Some(keycode),
             _ => (),
@@ -193,7 +200,7 @@ impl event::EventHandler for MainState {
             None => self.ecsystem.input.keymod_up = Some(keymod),
             _ => (),
         }
-
+        */
         //self.ecsystem.input = Input {
             //keycode_down: self.ecsystem.input.keycode_down,
             //keymod_down: self.ecsystem.input.keymod_down,

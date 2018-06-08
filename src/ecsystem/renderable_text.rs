@@ -26,6 +26,8 @@ pub fn renderable_text_update(component: &mut Component, ctx: &mut Context, ecs:
     match component {
         &mut Component::RenderableText{..} => {
            // println!("RT UPDATE");
+           
+            //println!("{:?}", ecs.blackboard.panel().get(&go.tag().to_string()));
         }
         _ => (),
     }
