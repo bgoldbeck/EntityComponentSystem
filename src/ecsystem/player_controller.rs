@@ -96,9 +96,9 @@ pub fn player_controller_update(component: &mut Component, ctx: &mut Context, ec
                 ecs.input.keycode_up = None;
             }
 
-            //ecs.blackboard.scribble(go.tag().clone(), BlackboardObject::Int(35));
+            ecs.blackboard.scribble(go.tag().clone(), BlackboardObject::Doodle{object: Box::new(32 as u32)});
           
-
+          
             let mut left: bool = CONTROLS.lock().unwrap().left;
             let mut right: bool = CONTROLS.lock().unwrap().right;
             let mut up: bool = CONTROLS.lock().unwrap().up;

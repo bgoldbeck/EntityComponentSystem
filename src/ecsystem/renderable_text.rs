@@ -6,7 +6,7 @@ use ecsystem::component::Component;
 use ecsystem::component::IComponent;
 use ecsystem::gameobject::GameObject;
 use ecsystem::ECSystem;
-
+use ecsystem::blackboard::*;
 
 
 
@@ -26,8 +26,17 @@ pub fn renderable_text_update(component: &mut Component, ctx: &mut Context, ecs:
     match component {
         &mut Component::RenderableText{..} => {
            // println!("RT UPDATE");
-           
-            //println!("{:?}", ecs.blackboard.panel().get(&go.tag().to_string()));
+            let panel = ecs.blackboard.panel();
+            let option_obj: Option<&BlackboardObject> = panel.get(&go.tag().to_string());
+            
+            if option_obj.is_some() {
+                let blackboard_obj: &BlackboardObject = option_obj.unwrap();
+                let blackboard_obj_value = blackboard_obj.to_value::<u32>().unwrap();
+
+                println!("{:?}", blackboard_obj_value);
+            }
+            
+            
         }
         _ => (),
     }

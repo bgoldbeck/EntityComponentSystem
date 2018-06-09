@@ -4,20 +4,32 @@ use std::collections::HashMap;
 use std::cell::RefCell;
 use std::cell::Ref;
 use std::rc::Rc;
+use std::any::*;
+
+pub trait IBObject {
+    fn to_value<T: 'static>(&self) -> Option<&T>;
+}
 
 #[derive(Debug)]
 pub enum BlackboardObject {
-    Int(i64),
-    UInt(u64),
-    String(String),
+    Doodle {
+        object: (Box<Any>),
+    },
 }
 
+impl<'a> IBObject for BlackboardObject {
+    fn to_value<T: 'static>(&self) -> Option<&T> {
+        match self {
+            &BlackboardObject::Doodle{ref object} => object.downcast_ref::<T>(),
+            _ => None,
+        }
+    }
+}
 
 pub struct Blackboard {
     pub map: Rc<RefCell<HashMap<String, BlackboardObject>>>,
-    //pub map: HashMap<String, BlackboardObject>;
-}
 
+}
 
 impl Blackboard {
     pub fn new() -> Blackboard {
